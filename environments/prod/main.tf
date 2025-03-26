@@ -1,4 +1,3 @@
-# environments/prod/main.tf
 module "hub_vpc" {
   source             = "../../modules/vpc"
   name               = "hub"
