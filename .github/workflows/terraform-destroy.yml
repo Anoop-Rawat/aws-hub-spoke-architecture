@@ -36,8 +36,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_SECRET_ACCESS_KEY_DEV || secrets.AWS_SECRET_ACCESS_KEY_PROD }}
 
       # Select Workspace
-      - name: Select Workspace
-        run: terraform workspace select ${{ github.event.inputs.environment }}
+      #- name: Select Workspace
+      #  run: terraform workspace select ${{ github.event.inputs.environment }}
 
       # Terraform Destroy
       - name: Terraform Destroy
