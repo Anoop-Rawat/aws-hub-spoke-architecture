@@ -38,6 +38,13 @@ jobs:
       # Select Workspace
       #- name: Select Workspace
       #  run: terraform workspace select ${{ github.event.inputs.environment }}
+      
+      # create and select dev workspace
+      - name: Create new workspace
+        run: terraform workspace new ${{ github.event.inputs.environment }}
+    
+      - name: Select Dev Workspace
+        run: terraform workspace select  ${{ github.event.inputs.environment }} || terraform workspace new  ${{ github.event.inputs.environment }}
 
       # Terraform Destroy
       - name: Terraform Destroy
