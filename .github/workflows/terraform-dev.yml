@@ -1,0 +1,52 @@
+# .github/workflows/terraform-dev.yml
+name: 'Terraform Dev Deployment'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'main.tf'           # Trigger on changes to main.tf
+      - 'modules/**'       # Trigger on changes to any module
+  workflow_dispatch:       # Allow manual trigger
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    environment: dev       # GitHub Environment for dev
+
+    steps:
+    # Checkout the repository
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Setup Terraform
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.7  # Specify your Terraform version
+
+    # Initialize Terraform
+    - name: Terraform Init
+      run: terraform init
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+
+    # Select dev workspace
+    - name: Select Dev Workspace
+      run: terraform workspace select dev || terraform workspace new dev
+
+    # Terraform Plan
+    - name: Terraform Plan
+      run: terraform plan -out=tfplan
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+
+    # Terraform Apply
+    - name: Terraform Apply
+      run: terraform apply -auto-approve tfplan
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
