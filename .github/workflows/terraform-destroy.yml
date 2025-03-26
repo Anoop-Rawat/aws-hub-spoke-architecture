@@ -1,0 +1,47 @@
+# .github/workflows/terraform-destroy.yml
+name: 'Terraform Destroy'
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to destroy (dev or prod)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      # Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7
+
+      # Terraform Init
+      - name: Terraform Init
+        run: terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets[format('AWS_ACCESS_KEY_ID_{0}', github.event.inputs.environment == 'dev' ? 'DEV' : 'PROD')] }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets[format('AWS_SECRET_ACCESS_KEY_{0}', github.event.inputs.environment == 'dev' ? 'DEV' : 'PROD')] }}
+
+      # Select Workspace
+      - name: Select Workspace
+        run: terraform workspace select ${{ github.event.inputs.environment }}
+
+      # Terraform Destroy
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets[format('AWS_ACCESS_KEY_ID_{0}', github.event.inputs.environment == 'dev' ? 'DEV' : 'PROD')] }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets[format('AWS_SECRET_ACCESS_KEY_{0}', github.event.inputs.environment == 'dev' ? 'DEV' : 'PROD')] }}
