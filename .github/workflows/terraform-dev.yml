@@ -32,11 +32,7 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
-
-    # create and select dev workspace
-    - name: Create new workspace
-      run: terraform workspace new dev
-    
+  
     - name: Select Dev Workspace
       run: terraform workspace select dev || terraform workspace new dev
 
